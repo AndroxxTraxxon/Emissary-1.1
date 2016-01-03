@@ -4,7 +4,7 @@ using System;
 
 namespace Assets._Scripts
 {
-    public class Grid: ScriptableObject
+    public class Grid
     {
         //public Transform player;
         public LayerMask unwalkableMask;
@@ -241,21 +241,28 @@ namespace Assets._Scripts
                 walkableRegionsDictionary.Add((int)Mathf.Log(region.terrainMask.value, 2), region.terrainPenalty);
             }
 
-            int rcx = (int)Mathf.Ceil(gridX * 1.0f / Region.STANDARD_SIZE - 0.00005f);
-            int rcy = (int)Mathf.Ceil(gridY * 1.0f / Region.STANDARD_SIZE - 0.00005f);
+            int rcx = (int)Mathf.Ceil((gridX * 1.0f) / (float)Region.STANDARD_SIZE);
+            int rcy = (int)Mathf.Ceil((gridY * 1.0f) / (float)Region.STANDARD_SIZE);
+
 
             int lastWidth = Region.STANDARD_SIZE;
-
             int lastHeight = Region.STANDARD_SIZE;
 
             lastWidth = (gridX % Region.STANDARD_SIZE == 0) ? lastWidth : (gridX % Region.STANDARD_SIZE);
             lastHeight = (gridY % Region.STANDARD_SIZE == 0) ? lastHeight : (gridY % Region.STANDARD_SIZE);
 
-            //Debug.Log(rcx + ", " + rcy);
-            //Debug.Log(lastHeight);
-            //Debug.Log(lastWidth);
+            /*Debug.Log(gridX + ", " + gridY);
+            Debug.Log(rcx + ", " + rcy);
+            Debug.Log(lastHeight);
+            Debug.Log(lastWidth);
 
+            if(regions == null)
+            {
+                regions = new Region[rcx, rcy];
+            }
+            regions = Region.ResizeArray<Region>(regions, rcx, rcy);*/
             regions = new Region[rcx, rcy];
+            
             Vector3 worldBottomLeft = position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
 
             for (int x = 0; x < rcx; x++)

@@ -20,8 +20,22 @@ namespace Assets._Scripts
         public bool displayGridGizmos;
         public static Field instance;
         // Use this for initialization
-        public Grid defaultGrid;
-        //default grid should be a separate GameObject in the scene, not managed by the Field.
+        public Grid dGrid = null;
+        public Grid defaultGrid
+        {
+            get
+            {
+                if (dGrid == null)
+                {
+                    dGrid = new Grid(transform.position, worldSize, nodeRadius, walkableRegions, walkableRegionsDictionary, unwalkableMask);
+                    Debug.Log("Default Grid Initialized");
+                    dGrid.target = Vector3.zero;
+
+
+                }
+                return dGrid;
+            }
+        }
 
         void Awake()
         {
@@ -30,6 +44,8 @@ namespace Assets._Scripts
             ActiveTargets = new List<Vector3>();
             GenerateDictionaryDefinition(Vector3.zero);
             UpdateValues(Vector3.zero);
+            dGrid = new Grid(transform.position, worldSize, nodeRadius, walkableRegions, walkableRegionsDictionary, unwalkableMask);
+
         }
 
         // Update is called once per frame
@@ -53,6 +69,8 @@ namespace Assets._Scripts
             Debug.Log(gridDict[location].target);
             //Debug.Log(gridDict[location]);
         }
+
+        
 
         public IEnumerator UpdateValues(Vector3 Target)
         {
@@ -286,7 +304,7 @@ namespace Assets._Scripts
             }
             else
             {
-                defaultGrid.displayGizmos = Grid.GizmoDisplay.SHOW;
+                defaultGrid.displayGizmos = Grid.GizmoDisplay.HIDE;
             }
 
 

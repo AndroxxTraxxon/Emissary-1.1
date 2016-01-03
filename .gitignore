@@ -242,17 +242,17 @@ ExportedObj/
 sysinfo.txt
 
     .DS_Store
-    Library/AssetImportState
-    Library/AssetServerCacheV3
-    Library/FailedAssetImports.txt
-    Library/ScriptAssemblies
-    Library/ScriptMapper
-    Library/assetDatabase3
-    Library/cache
-    Library/expandedItems
-    Library/metadata
-    Library/previews
-    Library/guidmapper
+    Emissary 1.1/Library/AssetImportState
+    Emissary 1.1/Library/AssetServerCacheV3
+    Emissary 1.1/Library/FailedAssetImports.txt
+    Emissary 1.1/Library/ScriptAssemblies
+    Emissary 1.1/Library/ScriptMapper
+    Emissary 1.1/Library/assetDatabase3
+    Emissary 1.1/Library/cache
+    Emissary 1.1/Library/expandedItems
+    Emissary 1.1/Library/metadata
+    Emissary 1.1/Library/previews
+    Emissary 1.1/Library/guidmapper
     Temp
     *.csproj
     *.pidb
@@ -260,3 +260,4 @@ sysinfo.txt
      
 
 
+*.info
