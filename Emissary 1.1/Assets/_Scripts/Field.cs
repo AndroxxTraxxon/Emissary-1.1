@@ -8,18 +8,18 @@ namespace Assets._Scripts
     public class Field : MonoBehaviour
     {
         static double rootTwo = Mathf.Sqrt(2f);
-        public Vector2 worldSize;
+        public Vector2 worldSize = Vector2.one;
         private Vector3 lastTarget;
-        public float nodeRadius;
+        public float nodeRadius = 1;
         public LayerMask unwalkableMask;
         public TerrainType[] walkableRegions;
         public Dictionary<int, int> walkableRegionsDictionary = new Dictionary<int, int>();
         public Dictionary<Vector3, Grid> gridDict;
         public List<Vector3> ActiveTargets;
         public static int distanceFactor = 10;
-        public bool displayGridGizmos;
         public static Field instance;
         // Use this for initialization
+        public Grid.GizmoDisplay DisplayGizmos = Grid.GizmoDisplay.SHOW;
         public Grid dGrid = null;
         public Grid defaultGrid
         {
@@ -27,8 +27,20 @@ namespace Assets._Scripts
             {
                 if (dGrid == null)
                 {
+                    //These checks are done when initializing the default grid.
+                    //If the world size or node radius sizes are out of bounds, then they will be corrected.
+                    if(worldSize.x <= 0 || worldSize.y <= 0)
+                    {
+                        worldSize = Vector2.one;
+                        Debug.Log("WARNING: world size must be greater than 0 in both X and Y. Re-sizing to Vector2.one.");
+                    }
+                    if(nodeRadius <= 0)
+                    {
+                        nodeRadius = 1;
+                        Debug.Log("WARNING: Node radius must be greater than 0. Re-sizing to 1.");
+                    }
                     dGrid = new Grid(transform.position, worldSize, nodeRadius, walkableRegions, walkableRegionsDictionary, unwalkableMask);
-                    Debug.Log("Default Grid Initialized");
+                    Debug.Log("Default Grid Successfully Initialized.");
                     dGrid.target = Vector3.zero;
 
 
@@ -39,19 +51,15 @@ namespace Assets._Scripts
 
         void Awake()
         {
+            //Setting global static instance for external Field reference. There should only be one Field in the project. There may be problems otherwise.
             instance = this;
+            //Set up the global grid pathing dictionary
             gridDict = new Dictionary<Vector3, Grid>();
+            //Set up list of active grids
             ActiveTargets = new List<Vector3>();
+            //Initializing 
             GenerateDictionaryDefinition(Vector3.zero);
             UpdateValues(Vector3.zero);
-            dGrid = new Grid(transform.position, worldSize, nodeRadius, walkableRegions, walkableRegionsDictionary, unwalkableMask);
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
         }
 
         public Vector3 standardizedLocation(Vector3 location)
@@ -64,17 +72,14 @@ namespace Assets._Scripts
             
             ActiveTargets.Add(location);
             gridDict.Add(location, new Grid(transform.position, worldSize, nodeRadius, walkableRegions, walkableRegionsDictionary, unwalkableMask));
-            Debug.Log("Grid Initialization success: " + gridDict.ContainsKey(location));
+            Debug.Log("Grid Dictionary Initialization success: " + gridDict.ContainsKey(location));
             gridDict[location].target = location;
             Debug.Log(gridDict[location].target);
             //Debug.Log(gridDict[location]);
         }
 
-        
-
         public IEnumerator UpdateValues(Vector3 Target)
         {
-            gridDict[lastTarget].displayGizmos = Grid.GizmoDisplay.HIDE;
             lastTarget = Target;
             gridDict[Target].target = Target;
             //Grid grid = gridDict[target];
@@ -155,7 +160,6 @@ namespace Assets._Scripts
 
         public IEnumerator UpdateValues(Vector3 Target, Vector3[] path)
         {
-            gridDict[lastTarget].displayGizmos = Grid.GizmoDisplay.HIDE;
             lastTarget = Target;
             gridDict[Target].target = Target;
             List<Region> regions = gridDict[Target].listRegionsAlongPath(path);
@@ -190,6 +194,7 @@ namespace Assets._Scripts
                 targetNode.gCost = 0;
                 openSet.Enqueue(targetNode);*/
             yield return null;
+
             foreach (Region region in gridDict[Target].listRegionsAlongPath(path))
             {
                 region.oriented = true;
@@ -294,17 +299,24 @@ namespace Assets._Scripts
 
         void OnDrawGizmos()
         {
-            if (displayGridGizmos && gridDict != null)
+            switch (DisplayGizmos)
             {
-                if (gridDict.Count > 0)
-                {
-                    gridDict[lastTarget].displayGizmos = Grid.GizmoDisplay.SHOW;
-                }
+                case Grid.GizmoDisplay.FORCE:
+                case Grid.GizmoDisplay.SHOW:
+                    if (gridDict != null && gridDict.Count != 0)
+                    {
+                        gridDict[lastTarget].DrawGizmos(DisplayGizmos);
+                    }
+                    else
+                    {
+                        defaultGrid.DrawGizmos(DisplayGizmos);
+                    } 
                 
-            }
-            else
-            {
-                defaultGrid.displayGizmos = Grid.GizmoDisplay.HIDE;
+                    break;
+                case Grid.GizmoDisplay.HIDE:
+                    break;
+                
+
             }
 
 

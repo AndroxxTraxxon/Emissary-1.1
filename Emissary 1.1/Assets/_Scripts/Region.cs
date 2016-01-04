@@ -38,7 +38,7 @@ namespace Assets._Scripts
             InitializeNodes();
         }
 
-        public Region(int x, int y, float nodeScale, Vector3 offset, Grid parentGrid)
+       /* public Region(int x, int y, float nodeScale, Vector3 offset, Grid parentGrid)
         {
             gridCoords = new Vector2(x, y);
             width = STANDARD_SIZE;
@@ -50,7 +50,7 @@ namespace Assets._Scripts
             this.parentGrid = parentGrid;
             RegionBottomLeft = offset - Vector3.right * width * nodeRadius - Vector3.forward * height * nodeRadius;
             InitializeNodes();
-        }
+        }*/
 
         public Region(int x, int y, int width, int height, float nodeScale, Vector3 offset, Grid parentGrid)
         {

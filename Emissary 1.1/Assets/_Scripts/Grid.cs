@@ -50,7 +50,7 @@ namespace Assets._Scripts
         }
 
         List<Region> regionList;
-        public GizmoDisplay displayGizmos = GizmoDisplay.HIDE;//this is only for use on the default grid
+        //public GizmoDisplay displayGizmos = GizmoDisplay.HIDE;//this is only for use on the default grid
         //public List<Unit> assignedUnits;
 
 
@@ -353,7 +353,7 @@ namespace Assets._Scripts
             return "V-Grid: Destination " + target;
         }
 
-        public void OnDrawGizmos()
+        public void DrawGizmos(GizmoDisplay displayGizmos)
         {
             switch(displayGizmos)
             {
