@@ -253,6 +253,7 @@ Emissary 1.1/Library/expandedItems
 Emissary 1.1/Library/metadata
 Emissary 1.1/Library/previews
 Emissary 1.1/Library/guidmapper
+Emissary 1.1/Library
 Temp
 *.csproj
 *.pidb
@@ -261,3 +262,5 @@ Temp
 
 
 *.info
+*.dwlt
+Emissary 1.1/Library/CurrentLayout.dwlt
