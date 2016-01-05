@@ -12,7 +12,7 @@ namespace Assets._Scripts
         Grid parentGrid;
         int width, height;
         Vector2 gridCoords;
-        Node[,] nodes;// = new Node[width, height];
+        internal Node[,] nodes;// = new Node[width, height];
         Vector3 offset;
         float nodeScale;
         float nodeRadius;
@@ -100,27 +100,7 @@ namespace Assets._Scripts
             return nodes[x, y];
         }
 
-        public void DrawGizmos()
-        {
-            Gizmos.color = Color.blue;//new Color(Region.rand.Range(0f,1f),Region.rand.Range(0f,1f),Region.rand.Range(0f,1f));
-            Gizmos.DrawWireCube(offset, Vector3.right * width * nodeScale + Vector3.forward * height * nodeScale);
-            if (nodes != null && oriented)
-            {
-                foreach (Node n in nodes)
-                {
-                    //Baseline: Walkable --> white; Not Walkable --> red
-                    Gizmos.color = new Color(1 - n.gCost / 255f, 1 - n.gCost / 255f, 1);
-                    if (!n.walkable) Gizmos.color = Color.red;
-                    else if (n.OnEdge) Gizmos.color = Color.green;
-                    else if (n.gCost == 0) Gizmos.color = Color.cyan;
-                    //Player Position --> cyan
-                    Gizmos.DrawCube(n.globalPosition, Vector3.one * (nodeScale * .195f));
-                    Gizmos.DrawRay(n.globalPosition, n.flowDirection * nodeScale);
-                }
-
-            }
-
-        }
+        
 
         internal Grid GetParentGrid()
         {
@@ -139,26 +119,34 @@ namespace Assets._Scripts
                 return gridCoords;
             }
         }
-
-        internal void ForceDrawGizmos()
+        internal void DrawGizmos(Grid.GizmoDisplay gizmoMode)
         {
-            Gizmos.color = Color.white;//new Color(Region.rand.Range(0f,1f),Region.rand.Range(0f,1f),Region.rand.Range(0f,1f));
-            Gizmos.DrawWireCube(offset, Vector3.right * width * nodeScale + Vector3.forward * height * nodeScale);
-            if (nodes != null)
-            {
-                foreach (Node n in nodes)
-                {
-                    //Baseline: Walkable --> white; Not Walkable --> red
-                    Gizmos.color = new Color(1 - n.gCost / 255f, 1 - n.gCost / 255f, 1);
-                    if (!n.walkable) Gizmos.color = Color.red;
-                    else if (n.OnEdge) Gizmos.color = Color.green;
-                    else if (n.gCost == 0) Gizmos.color = Color.cyan;
-                    //Player Position --> cyan
-                    Gizmos.DrawCube(n.globalPosition, Vector3.one * (nodeScale * .195f));
-                    Gizmos.DrawRay(n.globalPosition, n.flowDirection * nodeScale);
-                }
 
+            if (gizmoMode != Grid.GizmoDisplay.HIDE)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireCube(offset, Vector3.right * width * nodeScale + Vector3.forward * height * nodeScale);
+
+                if (nodes != null)
+                {
+                    if (gizmoMode != Grid.GizmoDisplay.MIN && (oriented || gizmoMode == Grid.GizmoDisplay.FORCE))
+                    {
+                        foreach (Node n in nodes)
+                        {
+                            //Baseline: Walkable --> white; Not Walkable --> red
+                            Gizmos.color = new Color(1 - n.gCost / 255f, 1 - n.gCost / 255f, 1);
+                            if (!n.walkable) Gizmos.color = Color.red;
+                            else if (n.OnEdge) Gizmos.color = Color.green;
+                            else if (n.gCost == 0) Gizmos.color = Color.cyan;
+                            //Player Position --> cyan
+                            Gizmos.DrawCube(n.globalPosition, Vector3.one * (nodeScale * .195f));
+                            Gizmos.DrawRay(n.globalPosition, n.flowDirection * nodeScale);
+                        }
+
+                    }
+                }
             }
+
         }
 
         public static T[,] ResizeArray<T>(T[,] original, int rows, int cols)

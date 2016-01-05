@@ -19,8 +19,8 @@ namespace Assets._Scripts
         public Vector3 target;
         float NodeDiameter;
         private int gridX, gridY;
-        private bool initialized = false;
-        public enum GizmoDisplay {HIDE, SHOW, FORCE};
+        //private bool initialized = false;
+        public enum GizmoDisplay {HIDE, MIN_DEF, MIN ,DEFAULT, SHOW, FORCE};
 
         private static Vector2[] neighborNodeLocs = {
             new Vector2(-1,1), new Vector2(0,1), new Vector2(1,1),
@@ -29,7 +29,7 @@ namespace Assets._Scripts
         };
         private static Vector2[] adjNodeLocs =  {
             /*skip the corner*/ new Vector2(0,1), /*skip corner*/
-            new Vector2(-1,0), /*skip   middle*/ new Vector2(0,1),
+            new Vector2(-1,0), /*skip   middle*/ new Vector2(1,0),
             /*skip the corner*/ new Vector2(0,-1) /*skip corner*/
         };
 
@@ -183,6 +183,100 @@ namespace Assets._Scripts
         {
             return GetNode(Position.x, Position.y);
         }
+        
+        public List<Node> getNodeQuad(Vector3 worldPosition)
+        {
+            List<Node> nodes = new List<Node>();
+
+            float percentX = (worldPosition.x + gridWorldSize.x / 2) / gridWorldSize.x;
+            float percentY = (worldPosition.z + gridWorldSize.y / 2) / gridWorldSize.y;
+            percentX = Mathf.Clamp01(percentX);
+            percentY = Mathf.Clamp01(percentY);
+
+            int xMax = (int)Mathf.Ceil((gridX - 1) * percentX);
+            int yMax = (int)Mathf.Ceil((gridY - 1) * percentY);
+            int xMin = (int)Mathf.Floor((gridX - 1) * percentX);
+            int yMin = (int)Mathf.Floor((gridX - 1) * percentY);
+            if(xMax == xMin)
+            {
+                if(percentX > .5f)
+                {
+                    xMin--;
+                }
+                else
+                {
+                    xMax++;
+                }
+            }
+            if(yMax == yMin)
+            {
+                if(percentY > .5f)
+                {
+                    yMin--;
+                }
+                else
+                {
+                    yMax++;
+                }
+            }
+            //Debug.Log("Grid Position: " + x + ", " + y);
+            nodes.Add(GetNode(xMax, yMax));
+            nodes.Add(GetNode(xMax, yMin));
+            nodes.Add(GetNode(xMin, yMax));
+            nodes.Add(GetNode(xMin, yMin));
+            return nodes;
+
+        }
+        public List<Node> getNodeQuad(Vector3 worldPosition, out Vector3 center)
+        {
+            List<Node> nodes = new List<Node>();
+
+            float percentX = (worldPosition.x + gridWorldSize.x / 2) / gridWorldSize.x;
+            float percentY = (worldPosition.z + gridWorldSize.y / 2) / gridWorldSize.y;
+            percentX = Mathf.Clamp01(percentX);
+            percentY = Mathf.Clamp01(percentY);
+
+            int xMax = (int)Mathf.Ceil((gridX - 1) * percentX);
+            int yMax = (int)Mathf.Ceil((gridY - 1) * percentY);
+            int xMin = (int)Mathf.Floor((gridX - 1) * percentX);
+            int yMin = (int)Mathf.Floor((gridX - 1) * percentY);
+            if (xMax == xMin)
+            {
+                if (percentX > .5f)
+                {
+                    xMin--;
+                }
+                else
+                {
+                    xMax++;
+                }
+            }
+            if (yMax == yMin)
+            {
+                if (percentY > .5f)
+                {
+                    yMin--;
+                }
+                else
+                {
+                    yMax++;
+                }
+            }
+            //Debug.Log("Grid Position: " + x + ", " + y);
+            nodes.Add(GetNode(xMax, yMax));
+            nodes.Add(GetNode(xMax, yMin));
+            nodes.Add(GetNode(xMin, yMax));
+            nodes.Add(GetNode(xMin, yMin));
+            center = Vector3.zero;
+            foreach(Node n in nodes)
+            {
+                center += n.globalPosition;
+            }
+            center /= 4;
+
+            return nodes;
+
+        }
 
         public List<Node> GetNeighborNodes(Node node)
         //returns a list of the (up to) eight neighboring Nodes, adjacent and diagonal Nodes.
@@ -217,7 +311,26 @@ namespace Assets._Scripts
             }
             return nodes;
         }
-        [SerializeField]
+
+        public List<Node> GetAdjacentWalkableOrientedNodes(Node node)
+        {
+            List<Node> nodes = new List<Node>();
+            Vector2 loc;
+            Node candidate;
+            foreach (Vector2 dir in adjNodeLocs)
+            {
+                loc = dir + node.GridPosition;
+                if (loc.x >= 0 && loc.x < gridX && loc.y >= 0 && loc.y < gridY)
+                {
+                    candidate = GetNode(loc);
+                    if (candidate.walkable && candidate.region.oriented)
+                        nodes.Add(candidate);
+                }
+
+            }
+            return nodes;
+        }
+
 
         void CreateGrid()
         //initializes the grid and determines if each Node is walkable, then positions the Nodes in worldspace.
@@ -250,17 +363,7 @@ namespace Assets._Scripts
 
             lastWidth = (gridX % Region.STANDARD_SIZE == 0) ? lastWidth : (gridX % Region.STANDARD_SIZE);
             lastHeight = (gridY % Region.STANDARD_SIZE == 0) ? lastHeight : (gridY % Region.STANDARD_SIZE);
-
-            /*Debug.Log(gridX + ", " + gridY);
-            Debug.Log(rcx + ", " + rcy);
-            Debug.Log(lastHeight);
-            Debug.Log(lastWidth);
-
-            if(regions == null)
-            {
-                regions = new Region[rcx, rcy];
-            }
-            regions = Region.ResizeArray<Region>(regions, rcx, rcy);*/
+            
             regions = new Region[rcx, rcy];
             
             Vector3 worldBottomLeft = position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
@@ -271,44 +374,21 @@ namespace Assets._Scripts
                 {
                     int width = Region.STANDARD_SIZE;
                     int height = Region.STANDARD_SIZE;
-                    if (x >= rcx - 1)
+                    if (x == rcx - 1)
                     {
                         width = lastWidth;
                     }
 
-                    if (y >= rcy - 1)
+                    if (y == rcy - 1)
                     {
                         height = lastHeight;
                     }
-                    //Debug.Log("Radius:" + NodeRadius);
-                    //Debug.Log("X: " + x + ", Y: " + y);
-                    //Debug.Log("Width: " + width + ", Height: " + height);
-                    //Debug.Log(worldBottomLeft);
+
                     float centerX = worldBottomLeft.x + width * NodeRadius + x * RegionStandardSize.x;
                     float centerZ = worldBottomLeft.z + height * NodeRadius + y * RegionStandardSize.z;
 
-                    //Debug.Log(centerX + ", " + centerZ);
                     regions[x, y] = new Region(x, y, width, height, NodeDiameter, new Vector3(centerX, 0, centerZ), this);
                     regionList.Add(regions[x, y]);
-
-                    /*
-                    Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * NodeDiameter + NodeRadius) + Vector3.forward * (y * NodeDiameter + NodeRadius);
-                    bool walkable = !(Physics.CheckSphere(worldPoint, NodeRadius, unwalkableMask));
-                    int movementPenalty = 0;
-
-                    //raycast code
-                    if (walkable)
-                    {
-                        Ray ray = new Ray(worldPoint + Vector3.up * 50, Vector3.down);
-                        RaycastHit hit;
-                        if (Physics.Raycast(ray, out hit, 100, walkableMask))
-                        {
-                            walkableRegionsDictionary.TryGetValue(hit.collider.gameObject.layer, out movementPenalty);
-                        }
-                    }
-
-                    grid[x, y] = new Node(walkable, worldPoint, x, y, movementPenalty);
-                     */
                 }
 
             }
@@ -357,39 +437,23 @@ namespace Assets._Scripts
         {
             switch(displayGizmos)
             {
+
+                case GizmoDisplay.MIN:
+                    foreach(Node n in getNodeQuad(target))
+                    {
+                        Gizmos.color = Color.cyan;
+                        Gizmos.DrawWireCube(n.globalPosition, Vector3.one * NodeRadius / 2f);
+                    }
+                    goto case GizmoDisplay.SHOW;
                 case GizmoDisplay.SHOW:
-                    if (!initialized)
-                    {
-                        CreateGrid();
-                        initialized = true;
-                    }
-
-                    //Draw the bounding box of the grid view.
-                    Gizmos.DrawWireCube(position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
-                    foreach (Region region in regions)
-                    {
-                        region.DrawGizmos();
-                    }
-                    Gizmos.color = Color.cyan;
-                    Gizmos.DrawCube(target, Vector3.one * (NodeRadius));
-                    
-                    break;
                 case GizmoDisplay.FORCE:
-                    if (!initialized)
-                    {
-                        CreateGrid();
-                        initialized = true;
-                    }
                     Gizmos.DrawWireCube(position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
                     foreach (Region region in regions)
                     {
-                        region.ForceDrawGizmos();
+                        region.DrawGizmos(displayGizmos);
                     }
-
-                    Gizmos.color = Color.cyan;
-                    Gizmos.DrawCube(target, Vector3.one * (NodeRadius / 2));
-                    
                     break;
+                
                 default:
                     return;
             }
