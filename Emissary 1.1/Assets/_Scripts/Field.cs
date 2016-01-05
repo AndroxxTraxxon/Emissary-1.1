@@ -63,6 +63,8 @@ namespace Assets._Scripts
 
         public IEnumerator OrientGrid(Grid grid, Vector3 target)
         {
+            //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            //sw.Start();
             defaultGrid.getNodeQuad(target, out target);
             grid.target = (lastTarget = target);
             
@@ -90,7 +92,8 @@ namespace Assets._Scripts
             while (openSet.Count > 0)
             {
                 Node currentNode = openSet.Dequeue();
-                closedSet.Add(currentNode);
+                if(!closedSet.Contains(currentNode))
+                    closedSet.Add(currentNode);
                 foreach (Node node in grid.GetAdjacentNodes(currentNode))
                 {
                     //Debug.Log(node);
@@ -122,7 +125,7 @@ namespace Assets._Scripts
                             grid.GetNode(x, y).flowDirection = Vector3.zero;
                             continue;
                         }
-                        //grid.GetNode(x, y).region.oriented = true;
+
                         int up, down, left, right;
                         int upY, downY, leftX, rightX;
                         leftX = (x >= 1 && grid.GetNode(x - 1, y).region.oriented && grid.GetNode(x - 1, y).walkable) ? x - 1 : x;
@@ -141,6 +144,8 @@ namespace Assets._Scripts
                     }
                 }
             }
+            //sw.Stop();
+            //Debug.Log("Path found: " + sw.ElapsedMilliseconds + "ms.");
             yield return null;
 
         }
