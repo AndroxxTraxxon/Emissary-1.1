@@ -24,12 +24,26 @@ namespace Assets._Scripts
             set
             {
                 flowDir = value;
-                if (!walkable)
+                if (!walkable || gCost == 0)
                     flowDir = Vector3.zero;
-                else if (flowDir == null)
+                else if (flowDir == Vector3.one)
                 {
                     //reprocess flowDir if you set it to null.
+                    int up, down, left, right;
 
+                    Node[] nodes = region.GetParentGrid().AdjacentReferences(this);
+
+
+
+                    down = nodes[0].gCost;
+                    left = nodes[1].gCost;
+                    right = nodes[2].gCost;
+                    up = nodes[3].gCost;
+                    
+                    
+                    float factor = 1f / Mathf.Sqrt(4 * (Mathf.Pow(left - right, 2) + Mathf.Pow(down - up, 2)));
+                    Vector3 direction = new Vector3(left - right, 0f, up - down) * factor;
+                    flowDir = direction;
                 }
             }
         }
@@ -88,7 +102,7 @@ namespace Assets._Scripts
         {
             get
             {
-                return region.GridCoords * 16 + regionCoords;
+                return region.GridCoords * Region.STANDARD_SIZE + regionCoords;
             }
         }
         

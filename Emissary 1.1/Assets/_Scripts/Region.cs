@@ -8,7 +8,7 @@ namespace Assets._Scripts
     {
         public bool displayGridGizmos = true;
         // Use this for initialization
-        public const int STANDARD_SIZE = 16;
+        public const int STANDARD_SIZE = 3;
         Grid parentGrid;
         int width, height;
         Vector2 gridCoords;
@@ -38,19 +38,6 @@ namespace Assets._Scripts
             InitializeNodes();
         }
 
-       /* public Region(int x, int y, float nodeScale, Vector3 offset, Grid parentGrid)
-        {
-            gridCoords = new Vector2(x, y);
-            width = STANDARD_SIZE;
-            height = STANDARD_SIZE;
-            nodes = new Node[width, height];
-            this.nodeScale = nodeScale;
-            nodeRadius = nodeScale / 2f;
-            this.offset = offset;
-            this.parentGrid = parentGrid;
-            RegionBottomLeft = offset - Vector3.right * width * nodeRadius - Vector3.forward * height * nodeRadius;
-            InitializeNodes();
-        }*/
 
         public Region(int x, int y, int width, int height, float nodeScale, Vector3 offset, Grid parentGrid)
         {

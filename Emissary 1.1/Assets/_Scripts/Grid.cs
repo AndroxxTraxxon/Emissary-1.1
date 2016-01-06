@@ -165,8 +165,6 @@ namespace Assets._Scripts
         {
             int regionX = x / Region.STANDARD_SIZE;
             int regionY = y / Region.STANDARD_SIZE;
-            //Debug.Log("Region: " + regionX + ", " + regionY);
-            //Debug.Log(regions[regionX, regionY].ToString());
             x = x % Region.STANDARD_SIZE;
             y = y % Region.STANDARD_SIZE;
             //Debug.Log("Region Position: " + x + ", " + y);
@@ -315,7 +313,30 @@ namespace Assets._Scripts
         public Node[] AdjacentReferences(Node node)
         {
             Node[] nodes = new Node[4];
-
+            for(int i = 0; i < 4; i++)
+            {
+                Vector2 pos = adjNodeLocs[i] + node.GridPosition;
+                //0:up || 1:left || 2:right ||3:down
+                //   0
+                // 1 n 2
+                //   3
+                if(pos.x >= 0 && pos.x < gridSizeX && pos.y >= 0 && pos.y < gridSizeY)
+                {
+                    if (GetNode(pos).walkable && GetNode(pos).region.oriented)
+                    {
+                        nodes[i] = GetNode(pos);
+                    }
+                    else
+                    {
+                        nodes[i] = node;
+                    }
+                }
+                else
+                {
+                    nodes[i] = node;
+                }
+                
+            }
             return nodes; 
         } 
 

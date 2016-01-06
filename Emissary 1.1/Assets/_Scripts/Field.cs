@@ -21,7 +21,7 @@ namespace Assets._Scripts
         public static int distanceFactor = 10;
         public static Field instance;
         // Use this for initialization
-        public Grid.GizmoDisplay DisplayGizmos = Grid.GizmoDisplay.SHOW;
+        public Grid.GizmoDisplay DisplayGizmos = Grid.GizmoDisplay.MIN_DEF;
         public Grid dGrid = null;
         public Grid defaultGrid
         {
@@ -100,12 +100,12 @@ namespace Assets._Scripts
                     if (node.walkable)
                     {
                         int cost = currentNode.gCost + distanceFactor;
-                        if (!closedSet.Contains(node) || node.gCost > cost)
+                        if (!(closedSet.Contains(node)||openSet.Contains(node)))
                         {
                             //node.parent = currentNode;
-                            node.gCost = cost + node.movementPenalty;
+                            node.gCost = cost;// + node.movementPenalty;
                             //Debug.Log(node.gCost);
-                            if (!(openSet.Contains(node) || closedSet.Contains(node)))
+                            if (!(openSet.Contains(node)))
                             {
                                 openSet.Enqueue(node);
                             }
@@ -114,6 +114,12 @@ namespace Assets._Scripts
                 }
             }
             yield return null;
+            foreach(Node n in closedSet)
+            {
+                n.flowDirection = Vector3.one;//This value is used to trigger the processing for the node flowDirection. 
+                yield return new WaitForEndOfFrame();
+            }
+            /*
             for (int x = 0; x < grid.gridSizeX; x++)
             {
                 for (int y = 0; y < grid.gridSizeY; y++)
@@ -143,7 +149,7 @@ namespace Assets._Scripts
                         //Debug.Log("Orienting " + grid.GetNode(x, y));
                     }
                 }
-            }
+            }*/
             //sw.Stop();
             //Debug.Log("Path found: " + sw.ElapsedMilliseconds + "ms.");
             yield return null;
