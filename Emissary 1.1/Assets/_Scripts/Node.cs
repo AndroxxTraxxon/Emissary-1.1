@@ -14,7 +14,26 @@ namespace Assets._Scripts
         public Node parent; // For A* to keep track of where the path should take you. 
         public ArrayList children; // For flow field (there may need to be a better method), so that you know which nodes to update if this one is changed.
         public int movementPenalty; // Add this to cost to simulate sticky terrain or something. value may vary based on anything you want.
-        public Vector3 flowDirection;// for Flowfield.
+        private Vector3 flowDir = Vector3.zero;// for Flowfield.
+        public Vector3 flowDirection
+        {
+            get
+            {
+                return flowDir;
+            }
+            set
+            {
+                flowDir = value;
+                if (!walkable)
+                    flowDir = Vector3.zero;
+                else if (flowDir == null)
+                {
+                    //reprocess flowDir if you set it to null.
+
+                }
+            }
+        }
+
         public Region region;
         public bool OnEdge;
 
@@ -72,5 +91,6 @@ namespace Assets._Scripts
                 return region.GridCoords * 16 + regionCoords;
             }
         }
+        
     }
 }

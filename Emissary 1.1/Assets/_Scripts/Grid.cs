@@ -312,6 +312,13 @@ namespace Assets._Scripts
             return nodes;
         }
 
+        public Node[] AdjacentReferences(Node node)
+        {
+            Node[] nodes = new Node[4];
+
+            return nodes; 
+        } 
+
         public List<Node> GetAdjacentWalkableOrientedNodes(Node node)
         {
             List<Node> nodes = new List<Node>();
