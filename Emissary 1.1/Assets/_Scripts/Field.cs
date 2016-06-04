@@ -63,8 +63,8 @@ namespace Assets._Scripts
 
         public IEnumerator OrientGrid(Grid grid, Vector3 target)
         {
-            //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            //sw.Start();
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
             defaultGrid.getNodeQuad(target, out target);
             grid.target = (lastTarget = target);
             
@@ -92,23 +92,19 @@ namespace Assets._Scripts
             while (openSet.Count > 0)
             {
                 Node currentNode = openSet.Dequeue();
-                if(!closedSet.Contains(currentNode))
-                    closedSet.Add(currentNode);
+                closedSet.Add(currentNode);
                 foreach (Node node in grid.GetAdjacentNodes(currentNode))
                 {
                     //Debug.Log(node);
                     if (node.walkable)
                     {
                         int cost = currentNode.gCost + distanceFactor;
-                        if (!(closedSet.Contains(node)||openSet.Contains(node)))
+                        if ((!(closedSet.Contains(node) || openSet.Contains(node))) || node.gCost > cost)
                         {
                             //node.parent = currentNode;
                             node.gCost = cost;// + node.movementPenalty;
                             //Debug.Log(node.gCost);
-                            if (!(openSet.Contains(node)))
-                            {
-                                openSet.Enqueue(node);
-                            }
+                            openSet.Enqueue(node);
                         }
                     }
                 }
@@ -117,7 +113,7 @@ namespace Assets._Scripts
             foreach(Node n in closedSet)
             {
                 n.flowDirection = Vector3.one;//This value is used to trigger the processing for the node flowDirection. 
-                yield return new WaitForEndOfFrame();
+                //yield return new WaitForEndOfFrame();
             }
             /*
             for (int x = 0; x < grid.gridSizeX; x++)
@@ -150,8 +146,8 @@ namespace Assets._Scripts
                     }
                 }
             }*/
-            //sw.Stop();
-            //Debug.Log("Path found: " + sw.ElapsedMilliseconds + "ms.");
+            sw.Stop();
+            Debug.Log("Path found: " + sw.ElapsedMilliseconds + "ms.");
             yield return null;
 
         }

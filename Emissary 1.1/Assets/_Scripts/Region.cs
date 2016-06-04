@@ -8,7 +8,7 @@ namespace Assets._Scripts
     {
         public bool displayGridGizmos = true;
         // Use this for initialization
-        public const int STANDARD_SIZE = 3;
+        public const int STANDARD_SIZE = 16;
         Grid parentGrid;
         int width, height;
         Vector2 gridCoords;

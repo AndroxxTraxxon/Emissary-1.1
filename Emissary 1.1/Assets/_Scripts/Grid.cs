@@ -338,7 +338,39 @@ namespace Assets._Scripts
                 
             }
             return nodes; 
-        } 
+        }
+
+        public Node[] AdjacentReferences(Node node, out bool onEdge)
+        {
+            onEdge = false;
+            Node[] nodes = new Node[4];
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2 pos = adjNodeLocs[i] + node.GridPosition;
+                //0:up || 1:left || 2:right ||3:down
+                //   0
+                // 1 n 2
+                //   3
+                if (pos.x >= 0 && pos.x < gridSizeX && pos.y >= 0 && pos.y < gridSizeY)
+                {
+                    if (GetNode(pos).walkable && GetNode(pos).region.oriented)
+                    {
+                        nodes[i] = GetNode(pos);
+                    }
+                    else
+                    {
+                        nodes[i] = node;
+                        onEdge = true;
+                    }
+                }
+                else
+                {
+                    nodes[i] = node;
+                }
+
+            }
+            return nodes;
+        }
 
         public List<Node> GetAdjacentWalkableOrientedNodes(Node node)
         {
